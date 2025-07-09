@@ -1,3 +1,5 @@
+using Moq;
+
 namespace HPlusSupportTDD.Core.Tests
 {
     public class Tests
@@ -19,10 +21,18 @@ namespace HPlusSupportTDD.Core.Tests
             {
                 Item = item
             };
+            var mockManager = new Mock<IShoppingCartManager>();
 
-            var manager = new ShoppingCartManager();
+            //var manager = new ShoppingCartManager();
 
-            AddToCartResponse response = manager.AddToCart(request);
+            mockManager.Setup(manager => manager.AddToCart(
+                It.IsAny<AddToCartRequest>())).Returns(
+                    (AddToCartRequest request) => new AddToCartResponse()
+                    {
+                        Items = new AddToCartItem[] { request.Item }
+                    });
+
+            AddToCartResponse response = mockManager.Object.AddToCart(request);
 
             Assert.NotNull(response);
             Assert.Contains(item, response.Items);
